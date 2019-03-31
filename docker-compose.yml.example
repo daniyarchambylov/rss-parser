@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  app:
+    restart: always
+    build: .
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    command: "./start.sh"
+    environment:
+      SECRET_KEY: SECRET
+      ALLOWED_HOSTS: 127.0.0.1 localhost
+      DB_ENGINE: postgresql
+      DB_HOST: db
+      DB_NAME: rss_parser
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: rss_parser
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
