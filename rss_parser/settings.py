@@ -26,6 +26,7 @@ INSTALLED_APPS = [
 
     'django_nose',
 
+    'rss_parser.accounts',
     'rss_parser.feeds',
 ]
 
@@ -38,6 +39,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTH_USER_MODEL = 'accounts.User'
 
 ROOT_URLCONF = 'rss_parser.urls'
 
