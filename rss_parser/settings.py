@@ -2,7 +2,7 @@ import os
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC_DIR = os.path.join(BASE_DIR, 'rss_reader')
+SRC_DIR = os.path.join(BASE_DIR, 'rss_parser')
 
 
 SECRET_KEY = os.environ['SECRET_KEY']
@@ -47,7 +47,9 @@ ROOT_URLCONF = 'rss_parser.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(SRC_DIR, 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -108,3 +110,5 @@ NOSE_ARGS = [
     '--cover-xml',
     '--cover-package=rss_parser',
 ]
+
+LOGIN_REDIRECT_URL = '/'
