@@ -23,6 +23,7 @@ def validate_parsed_data(data):
 
     return True
 
+
 def parse(url):
     feed_parsed = feedparser.parse(url)
 

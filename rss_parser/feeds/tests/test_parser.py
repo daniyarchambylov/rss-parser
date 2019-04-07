@@ -78,7 +78,7 @@ class FeedParserTestCase(unittest.TestCase):
         self.assertTrue(mocked_validate.called)
 
     @patch('rss_parser.feeds.parser.feedparser.parse')
-    def test_parse_ok(self, mocked_parse):
+    def test_parse_error(self, mocked_parse):
         mocked_parse.return_value = {
             'feed': {
                 'link': '/',
