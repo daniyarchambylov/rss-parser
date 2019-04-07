@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_nose',
+
+    'rss_parser.feeds',
 ]
 
 MIDDLEWARE = [
