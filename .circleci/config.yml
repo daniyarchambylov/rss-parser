@@ -11,7 +11,7 @@ jobs:
           SECRET_KEY: $SECRET_KEY
           ALLOWED_HOSTS: 127.0.0.1 localhost
           DB_ENGINE: postgresql
-          DB_HOST: localhost
+          DB_HOST: 127.0.0.1
           DB_NAME: $DB_NAME
           DB_USER: $DB_USER
           DB_PASSWORD: $DB_PASSWORD
