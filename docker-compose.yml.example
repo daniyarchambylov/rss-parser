@@ -18,6 +18,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_PORT: 5432
+      CELERY_BROKER_URL: amqp://guest:guest@rabbit:5672//
   db:
     image: postgres
     restart: always
@@ -27,6 +28,26 @@ services:
       POSTGRES_DB: rss_parser
     volumes:
       - db_data:/var/lib/postgresql/data
+  rabbit:
+    image: rabbitmq:3
+    ports:
+      - "5672:5672"
+  worker:
+    restart: always
+    build: .
+    environment:
+      SECRET_KEY: SECRET
+      ALLOWED_HOSTS: 127.0.0.1 localhost
+      DB_ENGINE: postgresql
+      DB_HOST: db
+      DB_NAME: rss_parser
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+      CELERY_BROKER_URL: amqp://guest:guest@rabbit:5672//
+    depends_on:
+      - db
+    command: "celery -A rss_parser worker -l info"
 
 volumes:
   db_data:
