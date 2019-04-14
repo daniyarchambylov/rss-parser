@@ -2,6 +2,9 @@
 [run]
 branch = True
 source = rss_parser
+omit = 
+    rss_parser/wsgi.py
+    rss_parser/**/apps.py
 
 [report]
 ignore_errors = True
