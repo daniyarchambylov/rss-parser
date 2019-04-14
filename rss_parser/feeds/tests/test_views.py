@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from datetime import datetime
+from unittest.mock import patch
 from rss_parser.feeds.models import Feed, FeedArticle
 
 
@@ -109,3 +110,41 @@ class BookmarkedFeedsViewTestCase(BaseTestDataTestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEquals(ctx['page_title'], 'Bookmarks')
         self.assertEquals(len(ctx['object_list']), 1)
+
+
+class AddRssFeedViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create(first_name='Test', last_name='User', username='test')
+
+    def test_anonyous_redirect(self):
+        response = self.client.get('/add-feed/')
+        self.assertRedirects(response, '/login/?next=/add-feed/')
+
+    def test_render_page(self):
+        self.client.force_login(self.user)
+        response = self.client.get('/add-feed/')
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'feeds/new_feed.html')
+
+    @patch('rss_parser.feeds.forms.parse')
+    def test_post_ok(self, mocked_parse):
+        timetuple = datetime(2019, 2, 21).timetuple()
+        mocked_parse.return_value = {
+            'link': '/',
+            'title': 'Test title',
+            'publisher': 'Test publisher',
+            'updated_at': datetime(2019, 2, 21),
+            'rss_link': '/',
+            'items': [
+                {'title': 'Test 1', 'summary': 'S', 'link': '/1', 'author': 'A', 'published_parsed': timetuple},
+                {'title': 'Test 2', 'summary': 'S', 'link': '/2', 'author': 'A', 'published_parsed': timetuple},
+            ],
+        }
+        self.client.force_login(self.user)
+        response = self.client.post('/add-feed/', {
+            'url': 'https://rss.com/valid-rss-url/'
+        })
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, '/')
+        self.assertTrue(mocked_parse.called)

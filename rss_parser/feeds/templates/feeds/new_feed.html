@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Add New feed{% endblock page_title %}
+{% block body %}
+{% include 'incs/nav.html' %}
+<div class="valign-wrapper">
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="card-content">
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="url" type="text" class="validate{% if form.url.errors %} invalid{% endif %}" name="url" value="{{ form.url.value|default:'' }}">
+                                <label for="url">RSS Feed Url</label>
+                                {% if form.url.errors %}
+                                    {% for e in form.url.errors %}
+                                        <span class="helper-text" data-error="{{ e }}"></span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <button class="btn light-blue lighten-1" type="submit">
+                            Add
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

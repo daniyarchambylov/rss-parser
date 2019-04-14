@@ -10,5 +10,6 @@ urlpatterns = [
     path('register/', account_views.RegistrationView.as_view(), name='registration'),
     path('my-feeds/', feed_views.SubscribedArticlesListView.as_view(), name='my-feeds'),
     path('bookmarks/', feed_views.BookmarkedArticlesListView.as_view(), name='bookmarks'),
+    path('add-feed/', feed_views.AddRssFeedView.as_view(), name='add-rss-feed'),
     path('', feed_views.ArticleListView.as_view(), name='home'),
 ]

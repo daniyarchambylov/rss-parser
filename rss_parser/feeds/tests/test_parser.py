@@ -64,13 +64,13 @@ class FeedParserTestCase(unittest.TestCase):
             'bozo': 0,
         }
         expected = {
-                'link': '/',
-                'title': 'Test title',
-                'publisher': 'Test publisher',
-                'rss_link': '/feed',
-                'updated_at': '2019-02-21',
-                'items': [1, 2, 3],
-            }
+            'link': '/',
+            'title': 'Test title',
+            'publisher': 'Test publisher',
+            'rss_link': '/feed',
+            'updated_at': '2019-02-21',
+            'items': [1, 2, 3],
+        }
         actual = parser.parse('/feed')
         self.assertEqual(actual, expected)
         self.assertTrue(mocked_parse.called)
