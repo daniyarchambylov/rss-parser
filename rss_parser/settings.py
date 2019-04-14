@@ -106,11 +106,8 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 NOSE_ARGS = [
     '--with-xunit',
-    '--with-coverage',
-    '--cover-xml',
-    '--cover-package=rss_parser',
 ]
 
 LOGIN_REDIRECT_URL = '/'
-
+LOGIN_URL = '/login/'
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')

@@ -13,7 +13,7 @@ def validate_parsed_data(data):
     if (data['bozo'] != 0):
         raise exc.FeedParserError(data['bozo_exception'])
 
-    required_fields = ['title', 'link', 'publisher', 'updated_parsed']
+    required_fields = ['title', 'link', 'updated_parsed']
 
     for field in required_fields:
         try:
@@ -34,7 +34,7 @@ def parse(url):
     return {
         'title': feed['title'],
         'link': feed['link'],
-        'publisher': feed['publisher'],
+        'publisher': feed.get('publisher', '1'),
         'rss_link': url,
         'updated_at': timestruct_to_datetime(feed['updated_parsed']),
         'items': items,

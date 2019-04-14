@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.views.generic.edit import FormView
 from .forms import RegistrationForm
 
@@ -11,7 +10,3 @@ class RegistrationView(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
-
-
-def home_view(request):
-    return render(request, 'accounts/home.html', locals())

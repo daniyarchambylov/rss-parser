@@ -49,3 +49,11 @@ class FeedArticle(models.Model):
         )
         feed_article.save()
         return feed_article
+
+    @classmethod
+    def list_user_feed_items(cls, user):
+        return cls.objects.filter(feed__users=user)
+
+    @classmethod
+    def list_bookmarked(cls, user):
+        return cls.objects.filter(users=user)

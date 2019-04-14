@@ -1,0 +1,19 @@
+<div class="col s12 m6 l4">
+    <div class="card">
+        <div class="card-content">
+            <div class="card__date">
+                <span>{{ article.published_at|date }}</span>
+            </div>
+        <span class="card-title grey-text text-darken-4">{{ article.title }}</span>
+        <p class="card-subtitle grey-text text-darken-2">{{ article.summary }}</p>
+        {% if article.author %}
+            <div class="row card-row">
+                <span class="text-darken-2 card-info">{{ article.author }}</span>
+            </div>
+        {% endif %}
+        </div>
+        <div class="card-action">
+            <a href="{{  article.link }}" target="_blank"><i class="material-icons">&nbsp;language</i>VISIT WEB</a>
+        </div>
+    </div>
+</div>
