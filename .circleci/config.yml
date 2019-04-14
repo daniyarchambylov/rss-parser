@@ -9,6 +9,7 @@ jobs:
       - image: circleci/python:3.7.1
         environment:
           SECRET_KEY: $SECRET_KEY
+          DEBUG: false
           ALLOWED_HOSTS: 127.0.0.1 localhost
           DB_ENGINE: postgresql
           DB_HOST: 127.0.0.1
