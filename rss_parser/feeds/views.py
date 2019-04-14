@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.views.generic.edit import FormView
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import FormView, FormMixin
 from django.views.generic.list import ListView
-from .models import FeedArticle
-from .forms import NewRssFeedForm
+from .models import FeedArticle, FeedArticleComments
+from .forms import NewRssFeedForm, NewFeedArticleCommentForm
 
 
 class ArticleListView(ListView):
@@ -46,6 +47,32 @@ class AddRssFeedView(FormView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
+
+    def form_valid(self, form):
+        user = self.request.user
+        form.save(user)
+        return super().form_valid(form)
+
+
+class ArticleCommentView(FormMixin, DetailView):
+    template_name = 'feeds/feed_details.html'
+    form_class = NewFeedArticleCommentForm
+    model = FeedArticle
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['user'] = self.request.user
+        initial['article'] = self.object
+        return initial
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+        ctx['comments'] = FeedArticleComments.filter_by_feed_article(self.object)
+        return ctx
 
     def form_valid(self, form):
         user = self.request.user

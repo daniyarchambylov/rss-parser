@@ -1,8 +1,7 @@
-# NewRssFeedForm
 from django.contrib.auth import get_user_model
 from django import forms
 from .parser import parse, normalize_feed_items
-from .models import Feed, FeedArticle
+from .models import Feed, FeedArticle, FeedArticleComments
 
 
 User = get_user_model()
@@ -31,3 +30,13 @@ class NewRssFeedForm(forms.Form):
         for item in self._parsed_data['items']:
             FeedArticle.create_from_feedparser(feed, item)
         return feed
+
+class NewFeedArticleCommentForm(forms.ModelForm):
+    class Meta:
+        model = FeedArticleComments
+        fields = ['user', 'comment', 'article']
+        widgets = {
+            'user': forms.HiddenInput(),
+            'article': forms.HiddenInput(),
+            'comment': forms.Textarea(),
+        }

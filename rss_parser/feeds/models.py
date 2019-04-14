@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class Feed(models.Model):
@@ -57,3 +58,14 @@ class FeedArticle(models.Model):
     @classmethod
     def list_bookmarked(cls, user):
         return cls.objects.filter(users=user)
+
+
+class FeedArticleComments(models.Model):
+    article = models.ForeignKey(FeedArticle, on_delete=models.CASCADE, related_name='comments')
+    comment = models.TextField()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='article_comments')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @classmethod
+    def filter_by_feed_article(cls, article, order_by='-id'):
+        return cls.objects.filter(article=article).order_by(order_by)
