@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load feeds %}
 
 {% block page_title %}Add New feed{% endblock page_title %}
 {% block body %}
@@ -19,7 +20,7 @@
             <div class="card">
                 <div class="card-content">
                     <span class="card-title grey-text text-darken-4">{{ comment.user }} - {{ comment.created_at|date }}</span>
-                    <p class="card-subtitle grey-text text-darken-2">{{ comment.comment }}</p>
+                    <p class="card-subtitle grey-text text-darken-2">{{ comment.comment|markdown }}</p>
                 </div>
             </div>
         </div>
