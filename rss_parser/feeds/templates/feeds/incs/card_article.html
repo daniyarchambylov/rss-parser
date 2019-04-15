@@ -8,30 +8,42 @@
         <p class="card-subtitle grey-text text-darken-2">{{ article.summary }}</p>
         {% if article.author %}
             <div class="row card-row">
-                <span class="text-darken-2 card-info">{{ article.author }}</span>
+                <span class="text-darken-2 card-info">Author: {{ article.author }}</span>
             </div>
         {% endif %}
 
         {% if form %}
             <form method="post">
                 {% csrf_token %}
-                {{ form.as_p }}
+                {% for hidden in form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
                 <div class="row">
                     <div class="input-field col s12">
-                        <input id="url" type="text" class="validate{% if form.url.errors %} invalid{% endif %}" name="url" value="{{ form.url.value|default:'' }}">
-                        <label for="url">RSS Feed Url</label>
-                        {% if form.url.errors %}
-                            {% for e in form.url.errors %}
+                        <textarea id="textarea1" class="materialize-textarea" name="comment"></textarea>
+                        <label for="textarea1">Leave your comment</label>
+                        {% if form.comment.errors %}
+                            {% for e in form.comment.errors %}
                                 <span class="helper-text" data-error="{{ e }}"></span>
                             {% endfor %}
                         {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                            <button class="btn light-blue lighten-1" type="submit">
+                                Comment
+                            </button>
                     </div>
                 </div>
             </form>
         {% endif %}
         </div>
         <div class="card-action">
-            <a href="{{  article.link }}" target="_blank"><i class="material-icons">&nbsp;language</i>VISIT WEB</a>
+            <a href="{{ article.link }}" target="_blank"><i class="material-icons">&nbsp;language</i>Original article</a>
+            {% if enable_comment %}
+                <a href="{% url 'feed-article-detail' article.id %}"><i class="material-icons">&nbsp;edit</i>Leave Comment</a>
+            {% endif %}
         </div>
     </div>
 </div>

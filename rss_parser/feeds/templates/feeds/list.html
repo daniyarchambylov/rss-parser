@@ -10,7 +10,7 @@
       <div class="col s12">
         <div id="card-container" class="row">
             {% for article in object_list %}
-                {% include 'feeds/incs/card_article.html' with article=article %}
+                {% include 'feeds/incs/card_article.html' with article=article enable_comment=True %}
             {% empty %}
                 <div>No articles yet.</div>
             {% endfor %}
