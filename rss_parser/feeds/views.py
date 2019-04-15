@@ -63,6 +63,10 @@ class ArticleCommentView(FormMixin, DetailView):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
+    def get_success_url(self):
+        # FIXME: replace with reverse
+        return '/articles/{}/'.format(self.object.id)
+
     def get_initial(self):
         initial = super().get_initial()
         initial['user'] = self.request.user
@@ -78,3 +82,10 @@ class ArticleCommentView(FormMixin, DetailView):
         user = self.request.user
         form.save(user)
         return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        return self.form_invalid(form)

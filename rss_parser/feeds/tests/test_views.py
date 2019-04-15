@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from datetime import datetime
 from unittest.mock import patch
-from rss_parser.feeds.models import Feed, FeedArticle
+from rss_parser.feeds.models import Feed, FeedArticle, FeedArticleComments
 
 
 User = get_user_model()
@@ -117,7 +117,7 @@ class AddRssFeedViewTestCase(TestCase):
     def setUpTestData(cls):
         cls.user = User.objects.create(first_name='Test', last_name='User', username='test')
 
-    def test_anonyous_redirect(self):
+    def test_anonymous_redirect(self):
         response = self.client.get('/add-feed/')
         self.assertRedirects(response, '/login/?next=/add-feed/')
 
@@ -148,3 +148,68 @@ class AddRssFeedViewTestCase(TestCase):
         self.assertEquals(response.status_code, 302)
         self.assertRedirects(response, '/')
         self.assertTrue(mocked_parse.called)
+
+
+class ArticleCommentView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create(first_name='Test', last_name='User', username='test')
+
+        feed = Feed.objects.create(
+            title='Test',
+            link='https://test.com',
+            rss_link='https://test.com',
+            publisher='Test',
+            updated_at=datetime.now()
+        )
+
+        cls.article = FeedArticle.objects.create(
+            feed=feed,
+            title='Test 1',
+            summary='Summary',
+            link='https://feed1.test/1',
+            author='Test publisher',
+            published_at=datetime.now(),
+        )
+
+        FeedArticleComments.objects.create(article=cls.article, user=cls.user, comment='Comment 1')
+        FeedArticleComments.objects.create(article=cls.article, user=cls.user, comment='Comment 2')
+
+    def test_anonymous_redirect(self):
+        response = self.client.get('/articles/{}/'.format(self.article.id))
+        self.assertRedirects(response, '/login/?next=/articles/{}/'.format(self.article.id))
+
+    def test_display_page(self):
+        self.client.force_login(self.user)
+        response = self.client.get('/articles/{}/'.format(self.article.id))
+        ctx = response.context
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(len(ctx['comments']), 2)
+        self.assertTemplateUsed('feeds/feed_details.html')
+
+    def test_display_page_404(self):
+        self.client.force_login(self.user)
+        response = self.client.get('/articles/{}/'.format(0))
+        ctx = response.context
+        self.assertEquals(response.status_code, 404)
+
+    def test_add_comment(self):
+        self.client.force_login(self.user)
+        response = self.client.post('/articles/{}/'.format(self.article.id), {
+            'comment': 'Comment 3',
+            'user': self.user.id,
+            'article': self.article.id
+        })
+        ctx = response.context
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, '/articles/{}/'.format(self.article.id))
+
+    def test_add_comment_error(self):
+        self.client.force_login(self.user)
+        response = self.client.post('/articles/{}/'.format(self.article.id), {
+            'user': self.user.id,
+            'article': self.article.id
+        })
+        ctx = response.context
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(list(ctx['form'].errors.keys()), ['comment'])
