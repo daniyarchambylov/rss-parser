@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from datetime import datetime
-from rss_parser.feeds.models import Feed, FeedArticle
+from rss_parser.feeds.models import Feed, FeedArticle, FeedArticleComments
 
 
 User = get_user_model()
@@ -126,3 +126,37 @@ class FeedArticleMethodsTestCase(TestCase):
         artilces2 = FeedArticle.list_bookmarked(self.user2)
         self.assertEqual(artilces.count(), 2)
         self.assertEqual(artilces2.count(), 0)
+
+
+class FeedArticleCommentsTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.create(username='test', first_name='First', last_name='Last')
+        feed = Feed.objects.create(
+            title='Test',
+            link='https://test.com',
+            rss_link='https://test.com',
+            publisher='Test',
+            updated_at=datetime.now()
+        )
+        article_data = {
+            'title': 'Test',
+            'summary': 'Summary',
+            'link': 'https://feed1.test/1',
+            'author': 'Test publisher',
+            'published_at': datetime.now(),
+        }
+
+        cls.article = FeedArticle.create_from_feedparser(feed, article_data)
+        FeedArticleComments.objects.create(article=cls.article, comment="comment", user=user)
+        FeedArticleComments.objects.create(article=cls.article, comment="bla bla comment", user=user)
+
+    def test_filter_by_feed_article(self):
+        comments = FeedArticleComments.filter_by_feed_article(self.article)
+        self.assertEqual(comments.count(), 2)
+        self.assertEqual(comments[0].comment, 'bla bla comment')
+
+    def test_filter_by_feed_article_by_commemt(self):
+        comments = FeedArticleComments.filter_by_feed_article(self.article, '-comment')
+        self.assertEqual(comments.count(), 2)
+        self.assertEqual(comments[0].comment, 'comment')

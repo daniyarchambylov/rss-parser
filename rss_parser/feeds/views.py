@@ -62,7 +62,7 @@ class ArticleCommentView(FormMixin, DetailView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
-    
+
     def get_initial(self):
         initial = super().get_initial()
         initial['user'] = self.request.user

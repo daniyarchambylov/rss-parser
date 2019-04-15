@@ -31,6 +31,7 @@ class NewRssFeedForm(forms.Form):
             FeedArticle.create_from_feedparser(feed, item)
         return feed
 
+
 class NewFeedArticleCommentForm(forms.ModelForm):
     class Meta:
         model = FeedArticleComments
