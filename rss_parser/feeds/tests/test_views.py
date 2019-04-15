@@ -190,7 +190,6 @@ class ArticleCommentView(TestCase):
     def test_display_page_404(self):
         self.client.force_login(self.user)
         response = self.client.get('/articles/{}/'.format(0))
-        ctx = response.context
         self.assertEquals(response.status_code, 404)
 
     def test_add_comment(self):
@@ -200,7 +199,6 @@ class ArticleCommentView(TestCase):
             'user': self.user.id,
             'article': self.article.id
         })
-        ctx = response.context
         self.assertEquals(response.status_code, 302)
         self.assertRedirects(response, '/articles/{}/'.format(self.article.id))
 
