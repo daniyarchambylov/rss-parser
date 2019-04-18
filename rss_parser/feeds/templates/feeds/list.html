@@ -10,7 +10,7 @@
       <div class="col s12">
         <div id="card-container" class="row">
             {% for article in object_list %}
-                {% include 'feeds/incs/card_article.html' with article=article enable_comment=True %}
+                {% include 'feeds/incs/card_article.html' with article=article enable_comment=True is_bookmark_page=is_bookmark_page %}
             {% empty %}
                 <div>No articles yet.</div>
             {% endfor %}
@@ -18,15 +18,4 @@
       </div>
     </div>
 </div>
-{% endblock body%}
-{% block js %}
-<script>
-(function($){
-    $(function(){
-  
-      $('.sidenav').sidenav();
-  
-    }); // end of document ready
-  })(jQuery); // end of jQuery name space
-</script>
-{% endblock js %}
+{% endblock body %}

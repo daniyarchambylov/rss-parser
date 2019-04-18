@@ -40,10 +40,11 @@
         {% endif %}
         </div>
         <div class="card-action">
-            <a href="{{ article.link }}" target="_blank"><i class="material-icons">&nbsp;language</i>Original article</a>
+            <a href="{{ article.link }}" target="_blank"><i class="material-icons">&nbsp;language</i>View article</a>
             {% if enable_comment %}
-                <a href="{% url 'feed-article-detail' article.id %}"><i class="material-icons">&nbsp;edit</i>Leave Comment</a>
+                <a href="{% url 'feed-article-detail' article.id %}"><i class="material-icons">&nbsp;edit</i>Comment</a>
             {% endif %}
+            <a href="{% url 'toggle-bookmark' article.id %}" class="bookmark-link"><i class="material-icons">&nbsp;{%if article.is_bookmarked or is_bookmark_page %}favorite{% else %}favorite_border{% endif %}</i></a>
         </div>
     </div>
 </div>

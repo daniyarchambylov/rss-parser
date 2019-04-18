@@ -1,10 +1,13 @@
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView, FormMixin
 from django.views.generic.list import ListView
+
 from .models import FeedArticle, FeedArticleComments
-from .forms import NewRssFeedForm, NewFeedArticleCommentForm
+from .forms import NewRssFeedForm, NewFeedArticleCommentForm, ToggleBookmarkForm
 
 
 class ArticleListView(ListView):
@@ -12,6 +15,12 @@ class ArticleListView(ListView):
     ordering = ['-published_at']
     template_name = 'feeds/list.html'
     page_title = 'Feeds'
+
+    def get_queryset(self):
+        return FeedArticle\
+            .get_with_bookmarked_field_qs(self.request.user)\
+            .all()\
+            .order_by('-published_at')
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
@@ -33,6 +42,11 @@ class SubscribedArticlesListView(ArticleListView):
 
 class BookmarkedArticlesListView(ArticleListView):
     page_title = 'Bookmarks'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+        ctx['is_bookmark_page'] = True
+        return ctx
 
     def get_queryset(self):
         user = self.request.user
@@ -89,3 +103,17 @@ class ArticleCommentView(FormMixin, DetailView):
         if form.is_valid():
             return self.form_valid(form)
         return self.form_invalid(form)
+
+
+@require_POST
+@login_required
+def toggle_bookmark_view(request, pk):
+    data = request.POST.copy()
+    data['user'] = request.user.id
+    data['article'] = pk
+
+    form = ToggleBookmarkForm(data)
+    if form.is_valid():
+        form.toggle()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error', 'errors': form.errors})

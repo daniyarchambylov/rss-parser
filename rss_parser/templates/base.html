@@ -16,6 +16,38 @@
      {% block body %} {% endblock body %}
      <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+     <script>
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+              }
+          }
+          return cookieValue;
+        }
+
+        $(document).ready(function() {
+          $('.sidenav').sidenav();
+          console.log('>>>>>',  $('.bookmark-link').length,  $('.bookmark-link')[0])
+          $('.bookmark-link').on('click', function (e) {
+            e.preventDefault();
+            console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>.')
+            const $this = $(this);
+            const url = $this.attr('href');
+            const csrfmiddlewaretoken = getCookie('csrftoken');
+            console.log('>>>>>>>>>.PREVENT>>>>>>>>>>>>>>.')
+            $.post(url, { csrfmiddlewaretoken }, function () {
+              window.location.reload();
+            })
+          })
+        });
+      </script>
      {% block js %}{% endblock js %}
   </body>
 </html>

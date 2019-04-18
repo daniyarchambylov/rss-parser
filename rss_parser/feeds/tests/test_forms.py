@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from datetime import datetime
 from unittest.mock import patch
 from rss_parser.feeds.models import Feed, FeedArticle
-from rss_parser.feeds.forms import NewRssFeedForm
+from rss_parser.feeds.forms import NewRssFeedForm, ToggleBookmarkForm
 
 User = get_user_model()
 
@@ -47,3 +47,41 @@ class NewRssFeedFormTestCase(TestCase):
         self.assertIsInstance(feed, Feed)
         self.assertEqual(FeedArticle.objects.filter(feed=feed).count(), 2)
         self.assertEqual(user.feeds.count(), 1)
+
+
+class ToggleBookmarkFormTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create(username='test-user')
+        feed = Feed.objects.create(
+            title='Test',
+            link='https://test.com',
+            rss_link='https://test.com',
+            publisher='Test',
+            updated_at=datetime.now()
+        )
+
+        cls.article = FeedArticle.objects.create(
+            feed=feed,
+            title='Test',
+            summary='Summary',
+            link='https://feed1.test/1',
+            author='Test publisher',
+            published_at=datetime.now()
+        )
+        cls.form = ToggleBookmarkForm({
+            'user': cls.user.id,
+            'article': cls.article.id
+        })
+        cls.form.is_valid()
+
+    def test_toggle_bookmark_add(self):
+        self.form.toggle()
+        count_bookmarks = self.user.bookmarked_articles.all().count()
+        self.assertEqual(count_bookmarks, 1)
+
+    def test_toggle_bookmark_remove(self):
+        self.user.bookmarked_articles.add(self.article)
+        self.form.toggle()
+        count_bookmarks = self.user.bookmarked_articles.all().count()
+        self.assertEqual(count_bookmarks, 0)

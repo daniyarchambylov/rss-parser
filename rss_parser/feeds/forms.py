@@ -41,3 +41,16 @@ class NewFeedArticleCommentForm(forms.ModelForm):
             'article': forms.HiddenInput(),
             'comment': forms.Textarea(),
         }
+
+
+class ToggleBookmarkForm(forms.Form):
+    user = forms.ModelChoiceField(queryset=User.objects.all())
+    article = forms.ModelChoiceField(queryset=FeedArticle.objects.all())
+
+    def toggle(self):
+        user = self.cleaned_data['user']
+        article = self.cleaned_data['article']
+        if user.bookmarked_articles.filter(id=article.id).exists():
+            user.bookmarked_articles.remove(article)
+        else:
+            user.bookmarked_articles.add(article)

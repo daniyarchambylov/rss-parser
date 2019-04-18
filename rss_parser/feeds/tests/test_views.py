@@ -211,3 +211,48 @@ class ArticleCommentView(TestCase):
         ctx = response.context
         self.assertEquals(response.status_code, 200)
         self.assertEquals(list(ctx['form'].errors.keys()), ['comment'])
+
+
+class ToggleBookmarkViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create(first_name='Test', last_name='User', username='test')
+
+        feed = Feed.objects.create(
+            title='Test',
+            link='https://test.com',
+            rss_link='https://test.com',
+            publisher='Test',
+            updated_at=datetime.now()
+        )
+
+        cls.article = FeedArticle.objects.create(
+            feed=feed,
+            title='Test 1',
+            summary='Summary',
+            link='https://feed1.test/1',
+            author='Test publisher',
+            published_at=datetime.now(),
+        )
+
+    def test_toggle_405(self):
+        response = self.client.get('/toggle-bookmark/{}/'.format(self.article.id))
+        self.assertEquals(response.status_code, 405)
+
+    def test_login_required(self):
+        response = self.client.post('/toggle-bookmark/{}/'.format(self.article.id))
+        self.assertEquals(response.status_code, 302)
+
+    def test_article_does_not_exist(self):
+        self.client.force_login(self.user)
+        response = self.client.post('/toggle-bookmark/0/')
+        res = response.json()
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(res['status'], 'error')
+
+    def test_article_toggle(self):
+        self.client.force_login(self.user)
+        response = self.client.post('/toggle-bookmark/{}/'.format(self.article.id))
+        res = response.json()
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(res['status'], 'success')

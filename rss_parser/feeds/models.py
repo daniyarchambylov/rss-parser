@@ -53,7 +53,18 @@ class FeedArticle(models.Model):
 
     @classmethod
     def list_user_feed_items(cls, user):
-        return cls.objects.filter(feed__users=user)
+        qs = cls.get_with_bookmarked_field_qs(user)
+        return qs.filter(feed__users=user)
+
+    @classmethod
+    def get_with_bookmarked_field_qs(cls, user):
+        return cls.objects.annotate(
+            is_bookmarked=models.Case(
+                models.When(users=user, then=models.Value(True)),
+                default=False,
+                output_field=models.BooleanField(),
+            )
+        )
 
     @classmethod
     def list_bookmarked(cls, user):
