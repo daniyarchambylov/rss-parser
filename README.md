@@ -1,5 +1,8 @@
 # Simple RSS Parser
 
+[![CircleCI](https://circleci.com/gh/daniyarchambylov/rss-parser.svg?style=svg)](https://circleci.com/gh/daniyarchambylov/rss-parser)
+[![Coverage Status](https://coveralls.io/repos/github/daniyarchambylov/rss-parser/badge.svg?branch=master)](https://coveralls.io/github/daniyarchambylov/rss-parser?branch=master)
+
 ## Usage
 
 1. Create a copy of docker-compose.yml.example to docker-compose.yml
