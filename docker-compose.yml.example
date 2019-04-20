@@ -19,6 +19,9 @@ services:
       DB_PASSWORD: postgres
       DB_PORT: 5432
       CELERY_BROKER_URL: amqp://guest:guest@rabbit:5672//
+      FETCH_FEEDS_MAX_RETRIES: 5
+      FETCH_FEEDS_RETRY_INTERVAL: 60
+      UPDATE_FEEDS_INTERVAL: 3600
   db:
     image: postgres
     restart: always
@@ -45,9 +48,31 @@ services:
       DB_PASSWORD: postgres
       DB_PORT: 5432
       CELERY_BROKER_URL: amqp://guest:guest@rabbit:5672//
+      FETCH_FEEDS_MAX_RETRIES: 5
+      FETCH_FEEDS_RETRY_INTERVAL: 60
+      UPDATE_FEEDS_INTERVAL: 3600
     depends_on:
       - db
     command: "celery -A rss_parser worker -l info"
-
+  beat:
+    restart: always
+    build: .
+    environment:
+      SECRET_KEY: SECRET
+      ALLOWED_HOSTS: 127.0.0.1 localhost
+      DB_ENGINE: postgresql
+      DB_HOST: db
+      DB_NAME: rss_parser
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+      CELERY_BROKER_URL: amqp://guest:guest@rabbit:5672//
+      FETCH_FEEDS_MAX_RETRIES: 5
+      FETCH_FEEDS_RETRY_INTERVAL: 60
+      UPDATE_FEEDS_INTERVAL: 3600
+    depends_on:
+      - db
+      - rabbit
+    command: "celery -A rss_parser beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
 volumes:
   db_data:
