@@ -1,12 +1,9 @@
-from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
 from rss_parser.accounts import views as account_views
 from rss_parser.feeds import views as feed_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    # path('admin/statuscheck/', include('celerybeat_status.urls'))
     path('login/', LoginView.as_view(template_name='accounts/login.html', redirect_authenticated_user=True), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', account_views.RegistrationView.as_view(), name='registration'),
