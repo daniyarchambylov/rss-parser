@@ -9,16 +9,27 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="card-content">
+                        {% for e in form.non_field_errors %}
+                            <div class="row">
+                                {{ e }}
+                            </div>
+                        {% endfor %}
                         <div class="row">
                             <div class="input-field col s12">
-                                <input id="username" type="text" class="validate" name="username">
+                                <input id="username" type="text" class="validate{% if form.username.errors %} invalid{% endif %}" name="username">
                                 <label for="username">Username</label>
+                                {% for e in form.username.errors %}
+                                    <span class="helper-text" data-error="{{ e }}"></span>
+                                {% endfor %}
                             </div>
                         </div>
                         <div class="row">
                             <div class="input-field col s12">
-                                <input id="password" type="password" class="validate" name="password">
+                                <input id="password" type="password" class="validate{% if form.password.errors %} invalid{% endif %}" name="password">
                                 <label for="password">Password</label>
+                                {% for e in form.password.errors %}
+                                    <span class="helper-text" data-error="{{ e }}"></span>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>

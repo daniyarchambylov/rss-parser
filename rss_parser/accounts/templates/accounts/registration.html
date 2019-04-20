@@ -9,22 +9,36 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="card-content">
+                        {% for e in form.non_field_errors %}
+                            <div class="row">
+                                {{ e }}
+                            </div>
+                        {% endfor %}
                         <div class="row">
                             <div class="input-field col s12">
-                                <input id="username" type="text" class="validate" name="username">
-                                <label for="username">Username</label>
+                                    <input id="username" type="text" class="validate{% if form.username.errors %} invalid{% endif %}" name="username">
+                                    <label for="username">Username</label>
+                                    {% for e in form.username.errors %}
+                                        <span class="helper-text" data-error="{{ e }}"></span>
+                                    {% endfor %}
                             </div>
                         </div>
                         <div class="row">
                             <div class="input-field col s12">
-                                <input id="password1" type="password" class="validate" name="password1">
+                                <input id="password1" type="password" class="validate{% if form.password1.errors %} invalid{% endif %}" name="password1">
                                 <label for="password1">Password</label>
+                                {% for e in form.password1.errors %}
+                                    <span class="helper-text" data-error="{{ e }}"></span>
+                                {% endfor %}
                             </div>
                         </div>
                         <div class="row">
                             <div class="input-field col s12">
-                                <input id="password2" type="password" class="validate" name="password2">
+                                <input id="password2" type="password" class="validate{% if form.password2.errors %} invalid{% endif %}" name="password2">
                                 <label for="password2">Repeat password</label>
+                                {% for e in form.password2.errors %}
+                                    <span class="helper-text" data-error="{{ e }}"></span>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
