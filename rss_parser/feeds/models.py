@@ -58,7 +58,7 @@ class FeedArticle(models.Model):
 
     @classmethod
     def get_with_bookmarked_field_qs(cls, user):
-        return cls.objects.annotate(
+        return cls.objects.prefetch_related('feed__users').annotate(
             is_bookmarked=models.Case(
                 models.When(users=user, then=models.Value(True)),
                 default=False,
@@ -69,6 +69,10 @@ class FeedArticle(models.Model):
     @classmethod
     def list_bookmarked(cls, user):
         return cls.objects.filter(users=user)
+
+    @property
+    def followers(self):
+        return self.feed.users.all().order_by('username')
 
 
 class FeedArticleComments(models.Model):

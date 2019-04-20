@@ -10,6 +10,9 @@
             <div class="row card-row">
                 <span class="text-darken-2 card-info">Author: {{ article.author }}</span>
             </div>
+            <div class="row card-row">
+                <span>Followed by: {{ article.followers|join:',' }}</span>
+            </div>
         {% endif %}
 
         {% if form %}
