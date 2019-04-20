@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django_celery_beat.models import PeriodicTask
 from datetime import datetime
 from unittest.mock import patch
 from rss_parser.feeds.models import Feed, FeedArticle
@@ -47,6 +48,7 @@ class NewRssFeedFormTestCase(TestCase):
         self.assertIsInstance(feed, Feed)
         self.assertEqual(FeedArticle.objects.filter(feed=feed).count(), 2)
         self.assertEqual(user.feeds.count(), 1)
+        self.assertTrue(PeriodicTask.objects.filter(name=feed.rss_link).exists())
 
 
 class ToggleBookmarkFormTestCase(TestCase):

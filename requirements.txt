@@ -3,4 +3,4 @@ psycopg2==2.7.7
 feedparser==5.2.1
 celery==4.3.0
 Markdown==3.1
-
+django-celery-beat==1.4.0

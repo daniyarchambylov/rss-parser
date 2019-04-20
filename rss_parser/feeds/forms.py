@@ -1,7 +1,10 @@
 from django.contrib.auth import get_user_model
 from django import forms
+from django.conf import settings
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from .parser import parse, normalize_feed_items
 from .models import Feed, FeedArticle, FeedArticleComments
+import json
 
 
 User = get_user_model()
@@ -24,11 +27,24 @@ class NewRssFeedForm(forms.Form):
         self._parsed_data['items'] = normalize_feed_items(self._parsed_data['items'])
         return url
 
+    def add_periodic_task(self, feed):
+        schedule, created = IntervalSchedule.objects.get_or_create(
+            every=settings.UPDATE_FEEDS_INTERVAL,
+            period=IntervalSchedule.SECONDS
+        )
+        PeriodicTask.objects.get_or_create(
+            interval=schedule,
+            name=feed.rss_link,
+            task=settings.FETCH_FEED_CELERY_TASK,
+            args=json.dumps([feed.rss_link]),
+        )
+
     def save(self, user):
         feed = Feed.create_from_feedparser(self._parsed_data)
         user.feeds.add(feed)
         for item in self._parsed_data['items']:
             FeedArticle.create_from_feedparser(feed, item)
+        self.add_periodic_task(feed)
         return feed
 
 
