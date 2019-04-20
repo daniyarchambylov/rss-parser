@@ -18,10 +18,8 @@ class Feed(models.Model):
             'publisher': data['publisher'],
         }
         try:
-            print('8888888888888888888')
             feed = cls.objects.get(**get_or_create_data)
         except cls.DoesNotExist:
-            print('ttttttttttttttttttttttttttttttttttt')
             feed = cls(**get_or_create_data)
 
         feed.updated_at = data['updated_at']
