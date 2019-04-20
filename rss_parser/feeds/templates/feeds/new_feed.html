@@ -3,11 +3,11 @@
 {% block page_title %}Add New feed{% endblock page_title %}
 {% block body %}
 {% include 'incs/nav.html' %}
-<div class="valign-wrapper">
+<div id="container">
     <div class="row">
         <div class="col s12">
             <div class="card">
-
+                <h2>Add Feed</h2>
                 <form method="post">
                     {% csrf_token %}
                     <div class="card-content">
@@ -31,6 +31,27 @@
                 </form>
             </div>
         </div>
+    </div>
+    <div>
+        {% if tasks %}
+            <h2>Rss Feed List</h2>
+            {% for t in tasks %}
+                <div class="row">
+                    <div class="col s8">
+                        <span>{{ t.name }}</span>
+                    </div>
+                    <div class="col s4">
+                            <span>
+                                {% if t.enabled %}
+                                    Active
+                                {% else %}
+                                    <a href="{% url 'resume-feed-update' t.id %}" class="resume-feed-update">Stopped</a>
+                                {% endif %}
+                            </span>
+                    </div>    
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
 </div>
 {% endblock body %}

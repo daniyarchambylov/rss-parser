@@ -34,18 +34,25 @@
 
         $(document).ready(function() {
           $('.sidenav').sidenav();
-          console.log('>>>>>',  $('.bookmark-link').length,  $('.bookmark-link')[0])
           $('.bookmark-link').on('click', function (e) {
             e.preventDefault();
-            console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>.')
             const $this = $(this);
             const url = $this.attr('href');
             const csrfmiddlewaretoken = getCookie('csrftoken');
-            console.log('>>>>>>>>>.PREVENT>>>>>>>>>>>>>>.')
             $.post(url, { csrfmiddlewaretoken }, function () {
               window.location.reload();
-            })
-          })
+            });
+          });
+
+          $('.resume-feed-update').on('click', function (e) {
+            e.preventDefault();
+            const $this = $(this);
+            const url = $this.attr('href');
+            const csrfmiddlewaretoken = getCookie('csrftoken');
+            $.post(url, { csrfmiddlewaretoken }, function () {
+              window.location.reload();
+            });
+          });
         });
       </script>
      {% block js %}{% endblock js %}

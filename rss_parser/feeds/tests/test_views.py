@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django_celery_beat.models import PeriodicTask
 from datetime import datetime
 from unittest.mock import patch
 from rss_parser.feeds.models import Feed, FeedArticle, FeedArticleComments
@@ -118,12 +119,12 @@ class AddRssFeedViewTestCase(TestCase):
         cls.user = User.objects.create(first_name='Test', last_name='User', username='test')
 
     def test_anonymous_redirect(self):
-        response = self.client.get('/add-feed/')
-        self.assertRedirects(response, '/login/?next=/add-feed/')
+        response = self.client.get('/settings/')
+        self.assertRedirects(response, '/login/?next=/settings/')
 
     def test_render_page(self):
         self.client.force_login(self.user)
-        response = self.client.get('/add-feed/')
+        response = self.client.get('/settings/')
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'feeds/new_feed.html')
 
@@ -142,7 +143,7 @@ class AddRssFeedViewTestCase(TestCase):
             ],
         }
         self.client.force_login(self.user)
-        response = self.client.post('/add-feed/', {
+        response = self.client.post('/settings/', {
             'url': 'https://rss.com/valid-rss-url/'
         })
         self.assertEquals(response.status_code, 302)
@@ -256,3 +257,47 @@ class ToggleBookmarkViewTestCase(TestCase):
         res = response.json()
         self.assertEquals(response.status_code, 200)
         self.assertEquals(res['status'], 'success')
+
+
+class ResumeFeedUpdateViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create(first_name='Test', last_name='User', username='test')
+
+        cls.feed = Feed.objects.create(
+            title='Test',
+            link='https://test.com',
+            rss_link='https://test.com',
+            publisher='Test',
+            updated_at=datetime.now()
+        )
+
+        cls.task = PeriodicTask.objects.create(name=cls.feed.rss_link, task='task', enabled=False)
+
+    def test_toggle_405(self):
+        response = self.client.get('/resume-feed-update/{}/'.format(self.task.id))
+        self.assertEquals(response.status_code, 405)
+
+    def test_login_required(self):
+        response = self.client.post('/resume-feed-update/{}/'.format(self.task.id))
+        self.assertEquals(response.status_code, 302)
+
+    def test_task_does_not_exist(self):
+        self.client.force_login(self.user)
+        response = self.client.post('/resume-feed-update/0/')
+        self.assertEquals(response.status_code, 404)
+
+    def test_403(self):
+        self.client.force_login(self.user)
+        response = self.client.post('/resume-feed-update/{}/'.format(self.task.id))
+        self.assertEquals(response.status_code, 403)
+
+    def test_success(self):
+        self.client.force_login(self.user)
+        self.user.feeds.add(self.feed)
+        response = self.client.post('/resume-feed-update/{}/'.format(self.task.id))
+        res = response.json()
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(res['status'], 'success')
+        task = PeriodicTask.objects.get(id=self.task.id)
+        self.assertTrue(task.enabled)
