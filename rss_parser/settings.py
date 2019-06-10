@@ -106,6 +106,8 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 NOSE_ARGS = [
     '--with-xunit',
+    '--xunit-file',
+    'test-results/nose/results.xml',
 ]
 
 LOGIN_REDIRECT_URL = '/'
